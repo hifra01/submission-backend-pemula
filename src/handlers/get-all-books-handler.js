@@ -3,10 +3,11 @@ const books = require('../books');
 const getAllBooksHandler = (request, h) => {
   let booksList = books;
 
-  const { name, reading, finished } = request.query;
+  const { name: queryName, reading, finished } = request.query;
 
-  if (name !== undefined) {
-    booksList = booksList.filter((book) => book.name.toLowerCase().includes(name.toLowerCase()));
+  if (queryName !== undefined) {
+    booksList = booksList.filter((book) => book.name.toLowerCase()
+      .includes(queryName.toLowerCase()));
   }
 
   if (reading === '1') {
@@ -22,7 +23,6 @@ const getAllBooksHandler = (request, h) => {
   }
 
   booksList = booksList.map((book) => {
-    // eslint-disable-next-line no-shadow
     const { id, name, publisher } = book;
     return { id, name, publisher };
   });
