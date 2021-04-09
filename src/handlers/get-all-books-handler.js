@@ -1,28 +1,45 @@
 const books = require('../books');
 
-const getAllBooksHandler = (request, h) => {
-  let booksList = books;
+const filterName = (bookList, queryName) => bookList.filter(
+  (book) => book.name.toLowerCase().includes(queryName.toLowerCase()),
+);
 
-  const { name: queryName, reading, finished } = request.query;
+const filterReading = (bookList, queryReading) => {
+  if (queryReading === '1') {
+    return bookList.filter((book) => book.reading === true);
+  } if (queryReading === '0') {
+    return bookList.filter((book) => book.reading === false);
+  }
+  return bookList;
+};
+
+const filterFinished = (bookList, queryFinished) => {
+  if (queryFinished === '1') {
+    return bookList.filter((book) => book.finished === true);
+  } if (queryFinished === '0') {
+    return bookList.filter((book) => book.finished === false);
+  }
+  return bookList;
+};
+
+const getAllBooksHandler = (request, h) => {
+  let bookList = books;
+
+  const { name: queryName, reading: queryReading, finished: queryFinished } = request.query;
 
   if (queryName !== undefined) {
-    booksList = booksList.filter((book) => book.name.toLowerCase()
-      .includes(queryName.toLowerCase()));
+    bookList = filterName(bookList, queryName);
   }
 
-  if (reading === '1') {
-    booksList = booksList.filter((book) => book.reading === true);
-  } else if (reading === '0') {
-    booksList = booksList.filter((book) => book.reading === false);
+  if (queryReading !== undefined) {
+    bookList = filterReading(bookList, queryReading);
   }
 
-  if (finished === '1') {
-    booksList = booksList.filter((book) => book.finished === true);
-  } else if (finished === '0') {
-    booksList = booksList.filter((book) => book.finished === false);
+  if (queryFinished !== undefined) {
+    bookList = filterFinished(bookList, queryFinished);
   }
 
-  booksList = booksList.map((book) => {
+  bookList = bookList.map((book) => {
     const { id, name, publisher } = book;
     return { id, name, publisher };
   });
@@ -30,7 +47,7 @@ const getAllBooksHandler = (request, h) => {
   const response = h.response({
     status: 'success',
     data: {
-      books: booksList,
+      books: bookList,
     },
   });
   response.code(200);
